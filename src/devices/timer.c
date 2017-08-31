@@ -163,14 +163,12 @@ static bool tick_less (const struct list_elem *aa, const struct list_elem *bb, v
 // Timer Wait By Shikhar
 void timer_wait (int64_t ticks)
 {
-  enum intr_level old_level;
-
-  struct thread *cur = thread_current ();
   // Sleep for 0 ticks
   if (ticks <= 0)
     return;
 
-  old_level = intr_disable ();
+  struct thread *cur = thread_current ();
+  enum intr_level old_level = intr_disable ();
   cur->time_wakeup = ticks;
 
   list_insert_ordered(&timer_wait_list, &cur->elem, tick_less, NULL);
