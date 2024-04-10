@@ -109,7 +109,7 @@ timer_sleep (int64_t ticks)
   // Implement By Shikhar
 
   // struct thread *cur = thread_current();
-  // cur->time_wakeup = ticks;
+  // cur->remaining_time = ticks;
   // enum intr_level old_level = intr_disable();
   // list_push_back(&timer_wait_list, &cur->allelem);
   // thread_block();
@@ -157,7 +157,7 @@ static bool tick_less (const struct list_elem *aa, const struct list_elem *bb, v
   ASSERT (bb != NULL);
   struct thread *a = list_entry (aa, struct thread, elem);
   struct thread *b = list_entry (bb, struct thread, elem);
-  return a->time_wakeup < b->time_wakeup;
+  return a->remaining_time < b->remaining_time;
 }
 
 // Timer Wait By Shikhar
@@ -169,7 +169,7 @@ void timer_wait (int64_t ticks)
 
   struct thread *cur = thread_current ();
   enum intr_level old_level = intr_disable ();
-  cur->time_wakeup = ticks;
+  cur->remaining_time = ticks;
 
   list_insert_ordered(&timer_wait_list, &cur->elem, tick_less, NULL);
   thread_block();
@@ -189,7 +189,7 @@ void timer_wakeup()
     {
       next = list_next (cur);
       t = list_entry (cur, struct thread, elem);
-      if (t->time_wakeup > timer_ticks())
+      if (t->remaining_time > timer_ticks())
         break;
 
       // Remove the thread from timer_wait_list
